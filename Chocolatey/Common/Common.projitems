@@ -9,6 +9,9 @@
     <Import_RootNamespace>Inedo.Extensions.Chocolatey</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Configurations\ChocolateyPackageConfiguration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\EnsurePackageOperation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\InstallPackageOperation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
   </ItemGroup>
 </Project>
