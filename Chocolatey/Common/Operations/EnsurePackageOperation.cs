@@ -52,7 +52,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
             args.Add(this.Template.PackageName);
 
             var output = await this.ExecuteChocolateyAsync(context, buffer.ToString()).ConfigureAwait(false);
-            if (output == null || output.Count < 1 || output[0].Length < 4 || string.Equals(output[0][3], "false", StringComparison.OrdinalIgnoreCase))
+            if (output == null || output.Count < 1 || output[0].Length < 4 || !string.Equals(output[0][3], "false", StringComparison.OrdinalIgnoreCase))
             {
                 // this assumes packages are never pinned
                 this.LogInformation($"Package {this.Template.PackageName} is not installed.");
