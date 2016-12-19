@@ -35,5 +35,11 @@ namespace Inedo.Extensions.Chocolatey.Configurations
         [ScriptAlias("Exists")]
         [DefaultValue(true)]
         public bool Exists { get; set; } = true;
+
+        [Persistent]
+        [ScriptAlias("Source")]
+        [ConfigurationKey]
+        [DefaultValue("https://chocolatey.org/api/v2")]
+        public string Source { get; set; } = "https://chocolatey.org/api/v2";
     }
 }

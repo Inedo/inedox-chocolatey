@@ -27,7 +27,14 @@ namespace Inedo.Extensions.Chocolatey.Operations
 #if Otter
         public override async Task<PersistedConfiguration> CollectAsync(IOperationExecutionContext context)
         {
-            var buffer = new StringBuilder("upgrade --yes --limit-output --fail-on-unfound --what-if \"", 200);
+            var buffer = new StringBuilder("upgrade --yes --limit-output --fail-on-unfound --what-if ", 200);
+            if (!string.IsNullOrEmpty(this.Template.Source))
+            {
+                buffer.Append("--source \"");
+                buffer.Append(this.Template.Source);
+                buffer.Append("\" ");
+            }
+            buffer.Append('\"');
             buffer.Append(this.Template.PackageName);
             buffer.Append('\"');
 
@@ -37,6 +44,11 @@ namespace Inedo.Extensions.Chocolatey.Operations
             args.Add("--limit-output");
             args.Add("--fail-on-unfound");
             args.Add("--what-if");
+            if (!string.IsNullOrEmpty(this.Template.Source))
+            {
+                args.Add("--source");
+                args.Add(this.Template.Source);
+            }
             args.Add(this.Template.PackageName);
 
             var output = await this.ExecuteChocolateyAsync(context, buffer.ToString()).ConfigureAwait(false);
@@ -48,7 +60,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 {
                     Exists = false,
                     PackageName = this.Template.PackageName,
-                    Version = this.Template.Version
+                    Source = this.Template.Source
                 };
             }
 
@@ -65,15 +77,17 @@ namespace Inedo.Extensions.Chocolatey.Operations
                     Exists = true,
                     PackageName = this.Template.PackageName,
                     Version = installedVersion,
-                    IsLatestVersion = true
+                    IsLatestVersion = true,
+                    Source = this.Template.Source
                 };
             }
 
             return new ChocolateyPackageConfiguration
             {
+                Exists = true,
                 PackageName = this.Template.PackageName,
                 Version = installedVersion,
-                Exists = true
+                Source = this.Template.Source
             };
         }
 
@@ -152,6 +166,13 @@ namespace Inedo.Extensions.Chocolatey.Operations
             {
                 buffer.Append("--version \"");
                 buffer.Append(this.Template.Version);
+                buffer.Append("\" ");
+            }
+
+            if (!string.IsNullOrEmpty(this.Template.Source))
+            {
+                buffer.Append("--source \"");
+                buffer.Append(this.Template.Source);
                 buffer.Append("\" ");
             }
 

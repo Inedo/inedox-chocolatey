@@ -35,6 +35,13 @@ namespace Inedo.Extensions.Chocolatey.Operations
         [Description("The version number of the package to install. Leave blank for the latest version.")]
         public string Version { get; set; }
 
+        [Persistent]
+        [ScriptAlias("Source")]
+        [DisplayName("Package source")]
+        [Description("The source containing the package. Can be a NuGet repository or one of the alternative sources.")]
+        [DefaultValue("https://chocolatey.org/api/v2")]
+        public string Source { get; set; } = "https://chocolatey.org/api/v2";
+
         public override async Task ExecuteAsync(IOperationExecutionContext context)
         {
             var buffer = new StringBuilder("upgrade --yes --fail-on-unfound ", 200);
@@ -46,6 +53,13 @@ namespace Inedo.Extensions.Chocolatey.Operations
             {
                 buffer.Append("--version \"");
                 buffer.Append(this.Version);
+                buffer.Append("\" ");
+            }
+
+            if (!string.IsNullOrEmpty(this.Source))
+            {
+                buffer.Append("--source \"");
+                buffer.Append(this.Source);
                 buffer.Append("\" ");
             }
 
