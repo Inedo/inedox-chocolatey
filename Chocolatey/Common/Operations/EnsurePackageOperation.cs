@@ -104,7 +104,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 if (string.IsNullOrEmpty(this.Template.Version) && !config.IsLatestVersion)
                     diffs.Add(new Difference(nameof(ChocolateyPackageConfiguration.IsLatestVersion), true, false));
 
-                if (!string.Equals(this.Template.Version, config.Version, StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrEmpty(this.Template.Version) && !string.Equals(this.Template.Version, config.Version, StringComparison.OrdinalIgnoreCase))
                     diffs.Add(new Difference(nameof(ChocolateyPackageConfiguration.Version), this.Template.Version, config.Version));
             }
 
