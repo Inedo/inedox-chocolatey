@@ -5,12 +5,15 @@ using Inedo.Agents;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
 using Inedo.Serialization;
+using Inedo.Extensions.Chocolatey.SuggestionProviders;
 #if Otter
 using Inedo.Otter.Extensibility;
 using Inedo.Otter.Extensibility.Operations;
+using Inedo.Otter.Web.Controls;
 #elif BuildMaster
 using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Operations;
+using Inedo.BuildMaster.Web.Controls;
 #endif
 
 namespace Inedo.Extensions.Chocolatey.Operations
@@ -27,12 +30,14 @@ namespace Inedo.Extensions.Chocolatey.Operations
         [Persistent]
         [ScriptAlias("Name")]
         [DisplayName("Package name")]
+        [SuggestibleValue(typeof(PackageNameSuggestionProvider))]
         public string PackageName { get; set; }
 
         [Persistent]
         [ScriptAlias("Version")]
         [DisplayName("Version")]
         [Description("The version number of the package to install. Leave blank for the latest version.")]
+        [SuggestibleValue(typeof(VersionSuggestionProvider))]
         public string Version { get; set; }
 
         [Persistent]
@@ -40,6 +45,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
         [DisplayName("Package source")]
         [Description("The source containing the package. Can be a NuGet repository or one of the alternative sources.")]
         [DefaultValue("https://chocolatey.org/api/v2")]
+        [SuggestibleValue(typeof(SpecialSourceSuggestionProvider))]
         public string Source { get; set; } = "https://chocolatey.org/api/v2";
 
         public override async Task ExecuteAsync(IOperationExecutionContext context)
