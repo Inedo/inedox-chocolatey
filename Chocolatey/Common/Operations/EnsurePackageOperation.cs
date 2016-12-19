@@ -67,26 +67,15 @@ namespace Inedo.Extensions.Chocolatey.Operations
             var installedVersion = output[0][1];
             var availableVersion = output[0][2];
 
-            this.LogInformation($"Package {this.Template.PackageName} is at version {installedVersion}.");
-
-            if (string.IsNullOrEmpty(this.Template.Version) && string.Equals(installedVersion, availableVersion, StringComparison.OrdinalIgnoreCase))
-            {
-                this.LogInformation($"Version {installedVersion} is installed.");
-                return new ChocolateyPackageConfiguration
-                {
-                    Exists = true,
-                    PackageName = this.Template.PackageName,
-                    Version = installedVersion,
-                    IsLatestVersion = true,
-                    Source = this.Template.Source
-                };
-            }
+            this.LogInformation($"Package {this.Template.PackageName} is at version {availableVersion}.");
+            this.LogInformation($"Version {installedVersion} is installed.");
 
             return new ChocolateyPackageConfiguration
             {
                 Exists = true,
                 PackageName = this.Template.PackageName,
                 Version = installedVersion,
+                IsLatestVersion = string.Equals(installedVersion, availableVersion, StringComparison.OrdinalIgnoreCase),
                 Source = this.Template.Source
             };
         }
