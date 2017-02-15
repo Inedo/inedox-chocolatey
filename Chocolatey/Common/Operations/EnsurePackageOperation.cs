@@ -22,6 +22,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
     [Description("Ensures that a Chocolatey package is installed on a server.")]
     [ScriptNamespace("Chocolatey")]
     [ScriptAlias("Ensure-Package")]
+    [Tag("chocolatey")]
     public sealed class EnsurePackageOperation : EnsureOperation<ChocolateyPackageConfiguration>
     {
 #if Otter
