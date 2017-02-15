@@ -13,5 +13,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Operations\EnsurePackageOperation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\InstallPackageOperation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SuggestionProviders\PackageNameSuggestionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SuggestionProviders\SpecialSourceSuggestionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SuggestionProviders\VersionSuggestionProvider.cs" />
   </ItemGroup>
 </Project>
