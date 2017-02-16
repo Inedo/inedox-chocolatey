@@ -129,19 +129,27 @@ namespace Inedo.Extensions.Chocolatey.Operations
                         }
                     };
 
-                process.Start();
-                await process.WaitAsync(context.CancellationToken).ConfigureAwait(false);
-                if (process.ExitCode < 0)
+                try
                 {
-                    this.LogError("Chocolatey returned exit code " + process.ExitCode);
-                    return null;
-                }
-                else if (error)
-                {
-                    return null;
-                }
+                    process.Start();
+                    await process.WaitAsync(context.CancellationToken).ConfigureAwait(false);
+                    if (process.ExitCode < 0)
+                    {
+                        this.LogError("Chocolatey returned exit code " + process.ExitCode);
+                        return null;
+                    }
+                    else if (error)
+                    {
+                        return null;
+                    }
 
-                return output;
+                    return output;
+                }
+                catch (Win32Exception ex)
+                {
+                    this.LogError("There was an error executing chocolatey. Ensure that chocolatey is installed on the remote server. Error was: " + ex.Message);
+                    return null;
+                }
             }
         }
 #endif
