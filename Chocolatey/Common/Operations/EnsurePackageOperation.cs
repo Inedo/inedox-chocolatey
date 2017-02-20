@@ -165,6 +165,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 buffer.Append("--version \"");
                 buffer.Append(this.Template.Version);
                 buffer.Append("\" ");
+                buffer.Append("--allow-downgrade ");
             }
 
             if (!string.IsNullOrEmpty(this.Template.Source))
