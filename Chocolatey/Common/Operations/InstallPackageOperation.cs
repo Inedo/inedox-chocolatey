@@ -60,6 +60,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 buffer.Append("--version \"");
                 buffer.Append(this.Version);
                 buffer.Append("\" ");
+                buffer.Append("--allow-downgrade ");
             }
 
             if (!string.IsNullOrEmpty(this.Source))
