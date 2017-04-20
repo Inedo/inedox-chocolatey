@@ -39,19 +39,6 @@ namespace Inedo.Extensions.Chocolatey.Operations
             buffer.Append(this.Template.PackageName);
             buffer.Append('\"');
 
-            var args = new List<string>();
-            args.Add("upgrade");
-            args.Add("--yes");
-            args.Add("--limit-output");
-            args.Add("--fail-on-unfound");
-            args.Add("--what-if");
-            if (!string.IsNullOrEmpty(this.Template.Source))
-            {
-                args.Add("--source");
-                args.Add(this.Template.Source);
-            }
-            args.Add(this.Template.PackageName);
-
             var output = await this.ExecuteChocolateyAsync(context, buffer.ToString()).ConfigureAwait(false);
             if (output == null || output.Count < 1 || output[0].Length < 4 || !string.Equals(output[0][3], "false", StringComparison.OrdinalIgnoreCase))
             {
