@@ -37,7 +37,8 @@ namespace Inedo.Extensions.Chocolatey.Operations
                         Package_Name: name,
                         Package_Version: version,
                         CollectedOn_Execution_Id: context.ExecutionId,
-                        Url_Text: null
+                        Url_Text: null,
+                        CollectedFor_ServerRole_Id: context.ServerRoleId
                     ).ConfigureAwait(false);
                 }
             }
