@@ -22,6 +22,9 @@ namespace Inedo.Extensions.Chocolatey.Operations
         {
             var output = await this.ExecuteChocolateyAsync(context, "list --limit-output --local-only").ConfigureAwait(false);
 
+            if (output == null)
+                return null;
+
             using (var db = new DB.Context())
             {
                 await db.ServerPackages_DeletePackagesAsync(Server_Id: context.ServerId, PackageType_Name: "Chocolately").ConfigureAwait(false);
