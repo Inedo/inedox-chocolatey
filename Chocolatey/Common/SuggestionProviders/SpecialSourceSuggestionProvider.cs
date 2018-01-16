@@ -8,6 +8,9 @@ using Inedo.Otter.Web.Controls;
 #elif BuildMaster
 using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Web.Controls;
+#else
+using Inedo.Extensibility;
+using Inedo.Web;
 #endif
 
 namespace Inedo.Extensions.Chocolatey.SuggestionProviders

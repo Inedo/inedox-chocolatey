@@ -11,6 +11,11 @@ using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Otter.Extensibility;
 using Inedo.Otter.Extensibility.Configurations;
 using Inedo.Otter.Extensibility.Operations;
+using IOperationCollectionContext = Inedo.Otter.Extensibility.Operations.IOperationExecutionContext;
+#else
+using Inedo.Extensibility;
+using Inedo.Extensibility.Configurations;
+using Inedo.Extensibility.Operations;
 #endif
 using Inedo.Diagnostics;
 using Inedo.Documentation;
@@ -25,8 +30,8 @@ namespace Inedo.Extensions.Chocolatey.Operations
     [Tag("chocolatey")]
     public sealed class EnsurePackageOperation : EnsureOperation<ChocolateyPackageConfiguration>
     {
-#if Otter
-        public override async Task<PersistedConfiguration> CollectAsync(IOperationExecutionContext context)
+#if !BuildMaster
+        public override async Task<PersistedConfiguration> CollectAsync(IOperationCollectionContext context)
         {
             var buffer = new StringBuilder("upgrade --yes --limit-output --fail-on-unfound --what-if ", 200);
             if (!string.IsNullOrEmpty(this.Template.Source))

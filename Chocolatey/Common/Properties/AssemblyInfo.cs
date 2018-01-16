@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 [assembly: AssemblyCompany("Inedo, LLC")]
-[assembly: AssemblyCopyright("Copyright © 2008 - 2016")]
+[assembly: AssemblyCopyright("Copyright © 2008 - 2018")]
 [assembly: AssemblyVersion("0.0.0.0")]
 [assembly: AssemblyFileVersion("0.0")]
 [assembly: CLSCompliant(false)]

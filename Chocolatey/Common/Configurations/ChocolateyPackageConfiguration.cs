@@ -6,11 +6,15 @@ using Inedo.Extensions.Chocolatey.SuggestionProviders;
 #if Otter
 using Inedo.Otter.Extensibility;
 using Inedo.Otter.Extensibility.Configurations;
-using Inedo.Otter.Web.Controls;
+using SuggestableValueAttribute = Inedo.Otter.Web.Controls.SuggestibleValueAttribute;
 #elif BuildMaster
 using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Configurations;
-using Inedo.BuildMaster.Web.Controls;
+using SuggestableValueAttribute = Inedo.BuildMaster.Web.Controls.SuggestibleValueAttribute;
+#else
+using Inedo.Extensibility;
+using Inedo.Extensibility.Configurations;
+using Inedo.Web;
 #endif
 
 namespace Inedo.Extensions.Chocolatey.Configurations
@@ -24,13 +28,13 @@ namespace Inedo.Extensions.Chocolatey.Configurations
         [ConfigurationKey]
         [ScriptAlias("Name")]
         [DisplayName("Package name")]
-        [SuggestibleValue(typeof(PackageNameSuggestionProvider))]
+        [SuggestableValue(typeof(PackageNameSuggestionProvider))]
         public string PackageName { get; set; }
 
         [Persistent]
         [ScriptAlias("Version")]
         [Description("The version number of the package to install. Leave blank for the latest version.")]
-        [SuggestibleValue(typeof(VersionSuggestionProvider))]
+        [SuggestableValue(typeof(VersionSuggestionProvider))]
         public string Version { get; set; }
 
         [Persistent]
@@ -45,7 +49,7 @@ namespace Inedo.Extensions.Chocolatey.Configurations
         [ScriptAlias("Source")]
         [ConfigurationKey]
         [DefaultValue("https://chocolatey.org/api/v2")]
-        [SuggestibleValue(typeof(SpecialSourceSuggestionProvider))]
+        [SuggestableValue(typeof(SpecialSourceSuggestionProvider))]
         public string Source { get; set; } = "https://chocolatey.org/api/v2";
     }
 }
