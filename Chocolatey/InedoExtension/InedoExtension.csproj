@@ -65,7 +65,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configurations\ChocolateyPackageConfiguration.cs" />
+    <Compile Include="Operations\EnsurePackageOperation.cs" />
+    <Compile Include="Operations\InstallPackageOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SuggestionProviders\PackageNameSuggestionProvider.cs" />
+    <Compile Include="SuggestionProviders\SpecialSourceSuggestionProvider.cs" />
+    <Compile Include="SuggestionProviders\VersionSuggestionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -73,6 +79,5 @@
   <ItemGroup>
     <Compile Include="Operations\CollectPackagesOperation.cs" />
   </ItemGroup>
-  <Import Project="..\Common\Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
