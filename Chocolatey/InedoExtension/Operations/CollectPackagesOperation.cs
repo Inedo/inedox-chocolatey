@@ -1,12 +1,13 @@
-﻿using Inedo.Agents;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using Inedo.Agents;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
 using Inedo.Extensibility;
 using Inedo.Extensibility.Configurations;
 using Inedo.Extensibility.Operations;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading.Tasks;
 
 namespace Inedo.Extensions.Chocolatey.Operations
 {
@@ -19,32 +20,30 @@ namespace Inedo.Extensions.Chocolatey.Operations
     {
         public async override Task<DictionaryConfiguration> CollectConfigAsync(IOperationCollectionContext context)
         {
-            var serverContext = context as ServerCollectionContext;
-
-            if (serverContext == null)
-                return null;
-
-            var output = await this.ExecuteChocolateyAsync(context, "list --limit-output --local-only").ConfigureAwait(false);
-
-            if (output == null)
-                return null;
-
-            await serverContext.ClearAllPackagesAsync("Chocolatey").ConfigureAwait(false);
-
-            foreach (var values in output)
+            using (var serverContext = context.GetServerCollectionContext())
             {
-                string name = values[0];
-                string version = values[1];
+                var output = await this.ExecuteChocolateyAsync(context, "list --limit-output --local-only").ConfigureAwait(false);
 
-                await serverContext.CreateOrUpdatePackageAsync(
-                    packageType: "Chocolatey",
-                    packageName: name,
-                    packageVersion: version,
-                    packageUrl: null
-                ).ConfigureAwait(false);
+                if (output == null)
+                    return null;
+
+                await serverContext.ClearAllPackagesAsync("Chocolatey").ConfigureAwait(false);
+
+                foreach (var values in output)
+                {
+                    string name = values[0];
+                    string version = values[1];
+
+                    await serverContext.CreateOrUpdatePackageAsync(
+                        packageType: "Chocolatey",
+                        packageName: name,
+                        packageVersion: version,
+                        packageUrl: null
+                    ).ConfigureAwait(false);
+                }
+
+                return null;
             }
-
-            return null;
         }
 
         protected override ExtendedRichDescription GetDescription(IOperationConfiguration config)
@@ -98,10 +97,23 @@ namespace Inedo.Extensions.Chocolatey.Operations
 
                     return output;
                 }
-                catch (Win32Exception ex)
+                catch (AggregateException aex) when (aex.InnerException is Win32Exception wex)
                 {
-                    this.LogError("There was an error executing chocolatey. Ensure that chocolatey is installed on the remote server. Error was: " + ex.Message);
+                    logChocolateyException(wex);
                     return null;
+                }
+                catch (Win32Exception wex)
+                {
+                    logChocolateyException(wex);
+                    return null;
+                }
+
+                void logChocolateyException(Win32Exception wex)
+                {
+                    this.LogError(
+                        "There was an error executing chocolatey. Ensure that chocolatey is installed on the remote server, and that 'choco.exe' is in the PATH. "
+                      + "If chocolatey has been installed while the Inedo Agent was already running, the Inedo Agent service should be restarted. ");
+                    this.LogDebug("The underlying error was: " + wex.Message);
                 }
             }
         }
