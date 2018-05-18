@@ -37,7 +37,6 @@ namespace Inedo.Extensions.Chocolatey.Configurations
 
         [Persistent]
         [ScriptAlias("Source")]
-        [ConfigurationKey]
         [DefaultValue("https://chocolatey.org/api/v2")]
         [SuggestableValue(typeof(SpecialSourceSuggestionProvider))]
         public string Source { get; set; } = "https://chocolatey.org/api/v2";
