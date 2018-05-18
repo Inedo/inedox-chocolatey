@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
-#if Otter
-using Inedo.Otter.Extensibility;
-using Inedo.Otter.Web.Controls;
-#elif BuildMaster
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Web.Controls;
-#else
+using System.Threading.Tasks;
 using Inedo.Extensibility;
 using Inedo.Web;
-#endif
 
 namespace Inedo.Extensions.Chocolatey.SuggestionProviders
 {

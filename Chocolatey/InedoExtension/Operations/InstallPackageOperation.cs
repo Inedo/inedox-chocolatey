@@ -4,23 +4,11 @@ using System.Threading.Tasks;
 using Inedo.Agents;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
-using Inedo.Serialization;
-using Inedo.Extensions.Chocolatey.SuggestionProviders;
-#if Otter
-using Inedo.Otter.Extensibility;
-using Inedo.Otter.Extensibility.Operations;
-using Inedo.Otter.Web.Controls;
-using SuggestableValueAttribute = Inedo.Otter.Web.Controls.SuggestibleValueAttribute;
-#elif BuildMaster
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Operations;
-using Inedo.BuildMaster.Web.Controls;
-using SuggestableValueAttribute = Inedo.BuildMaster.Web.Controls.SuggestibleValueAttribute;
-#else
 using Inedo.Extensibility;
 using Inedo.Extensibility.Operations;
+using Inedo.Extensions.Chocolatey.SuggestionProviders;
+using Inedo.Serialization;
 using Inedo.Web;
-#endif
 
 namespace Inedo.Extensions.Chocolatey.Operations
 {
