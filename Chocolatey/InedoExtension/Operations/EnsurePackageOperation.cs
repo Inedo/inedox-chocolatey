@@ -29,11 +29,12 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 buffer.Append(this.Template.Source);
                 buffer.Append("\" ");
             }
+
             buffer.Append('\"');
             buffer.Append(this.Template.PackageName);
             buffer.Append('\"');
 
-            var output = await this.ExecuteChocolateyAsync(context, buffer.ToString()).ConfigureAwait(false);
+            var output = await this.ExecuteChocolateyAsync(context, buffer.ToString());
             if (output == null || output.Count < 1 || output[0].Length < 4 || !string.Equals(output[0][3], "false", StringComparison.OrdinalIgnoreCase))
             {
                 // this assumes packages are never pinned
@@ -80,6 +81,83 @@ namespace Inedo.Extensions.Chocolatey.Operations
             }
 
             return new ComparisonResult(diffs);
+        }
+
+        public override async Task ConfigureAsync(IOperationExecutionContext context)
+        {
+            var buffer = new StringBuilder(200);
+
+            if (this.Template.Exists)
+            {
+                buffer.Append("upgrade --yes --fail-on-unfound ");
+                if (context.Simulation)
+                    buffer.Append("--what-if ");
+
+                if (!string.IsNullOrEmpty(this.Template.Version))
+                {
+                    buffer.Append("--version \"");
+                    buffer.Append(this.Template.Version);
+                    buffer.Append("\" ");
+                    buffer.Append("--allow-downgrade ");
+                }
+
+                if (!string.IsNullOrEmpty(this.Template.Source))
+                {
+                    buffer.Append("--source \"");
+                    buffer.Append(this.Template.Source);
+                    buffer.Append("\" ");
+                }
+            }
+            else
+            {
+                buffer.Append("uninstall --yes ");
+                if (context.Simulation)
+                    buffer.Append("--what-if ");
+            }
+
+            buffer.Append('\"');
+            buffer.Append(this.Template.PackageName);
+            buffer.Append('\"');
+
+            int exitCode = await this.ExecuteCommandLineAsync(
+                context,
+                new RemoteProcessStartInfo
+                {
+                    FileName = "choco",
+                    Arguments = buffer.ToString()
+                }
+            );
+
+            if (exitCode != 0)
+                this.LogError("Process exited with code " + exitCode);
+        }
+
+        protected override ExtendedRichDescription GetDescription(IOperationConfiguration config)
+        {
+            var state = "installed";
+            if (string.Equals(config[nameof(ChocolateyPackageConfiguration.Exists)], "false", StringComparison.OrdinalIgnoreCase))
+                state = "not installed";
+
+            if (string.IsNullOrEmpty(config[nameof(ChocolateyPackageConfiguration.Version)]))
+            {
+                return new ExtendedRichDescription(
+                    new RichDescription(
+                        "Ensure latest version of ",
+                        new Hilite(config[nameof(ChocolateyPackageConfiguration.PackageName)]),
+                        " from Chocolatey is " + state
+                    )
+                );
+            }
+
+            return new ExtendedRichDescription(
+                new RichDescription(
+                    "Ensure version ",
+                    new Hilite(config[nameof(ChocolateyPackageConfiguration.Version)]),
+                    " of ",
+                    new Hilite(config[nameof(ChocolateyPackageConfiguration.PackageName)]),
+                    " from Chocolatey is " + state
+                )
+            );
         }
 
         private async Task<List<string[]>> ExecuteChocolateyAsync(IOperationExecutionContext context, string args)
@@ -132,68 +210,6 @@ namespace Inedo.Extensions.Chocolatey.Operations
                     return null;
                 }
             }
-        }
-
-        public override async Task ConfigureAsync(IOperationExecutionContext context)
-        {
-            var buffer = new StringBuilder("upgrade --yes --fail-on-unfound ", 200);
-            if (context.Simulation)
-                buffer.Append("--what-if ");
-
-            if (!string.IsNullOrEmpty(this.Template.Version))
-            {
-                buffer.Append("--version \"");
-                buffer.Append(this.Template.Version);
-                buffer.Append("\" ");
-                buffer.Append("--allow-downgrade ");
-            }
-
-            if (!string.IsNullOrEmpty(this.Template.Source))
-            {
-                buffer.Append("--source \"");
-                buffer.Append(this.Template.Source);
-                buffer.Append("\" ");
-            }
-
-            buffer.Append('\"');
-            buffer.Append(this.Template.PackageName);
-            buffer.Append('\"');
-
-            int exitCode = await this.ExecuteCommandLineAsync(
-                context,
-                new RemoteProcessStartInfo
-                {
-                    FileName = "choco",
-                    Arguments = buffer.ToString()
-                }
-            ).ConfigureAwait(false);
-
-            if (exitCode != 0)
-                this.LogError("Process exited with code " + exitCode);
-        }
-
-        protected override ExtendedRichDescription GetDescription(IOperationConfiguration config)
-        {
-            if (string.IsNullOrEmpty(config[nameof(ChocolateyPackageConfiguration.Version)]))
-            {
-                return new ExtendedRichDescription(
-                    new RichDescription(
-                        "Ensure latest version of ",
-                        new Hilite(config[nameof(ChocolateyPackageConfiguration.PackageName)]),
-                        " from Chocolatey is installed"
-                    )
-                );
-            }
-
-            return new ExtendedRichDescription(
-                new RichDescription(
-                    "Ensure version ",
-                    new Hilite(config[nameof(ChocolateyPackageConfiguration.Version)]),
-                    " of ",
-                    new Hilite(config[nameof(ChocolateyPackageConfiguration.PackageName)]),
-                    " from Chocolatey is installed"
-                )
-            );
         }
     }
 }
