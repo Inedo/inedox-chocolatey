@@ -110,7 +110,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
             }
             else
             {
-                buffer.Append("uninstall --yes ");
+                buffer.Append("uninstall --yes --remove-dependencies ");
                 if (context.Simulation)
                     buffer.Append("--what-if ");
             }
