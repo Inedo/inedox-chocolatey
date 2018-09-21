@@ -65,12 +65,21 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configurations\ChocolateyFeatureConfiguration.cs" />
+    <Compile Include="Configurations\ChocolateyInstalledConfiguration.cs" />
     <Compile Include="Configurations\ChocolateyPackageConfiguration.cs" />
+    <Compile Include="Configurations\ChocolateySourceConfiguration.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Operations\EnsureFeatureOperation.cs" />
+    <Compile Include="Operations\EnsureInstalledOperation.cs" />
     <Compile Include="Operations\EnsurePackageOperation.cs" />
+    <Compile Include="Operations\EnsureSourceOperation.cs" />
     <Compile Include="Operations\InstallPackageOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SuggestionProviders\ChocolateyFeatureSuggestionProvider.cs" />
     <Compile Include="SuggestionProviders\PackageNameSuggestionProvider.cs" />
     <Compile Include="SuggestionProviders\SpecialSourceSuggestionProvider.cs" />
+    <Compile Include="SuggestionProviders\ChocolateyVersionSuggestionProvider.cs" />
     <Compile Include="SuggestionProviders\VersionSuggestionProvider.cs" />
   </ItemGroup>
   <ItemGroup>

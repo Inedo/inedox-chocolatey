@@ -15,7 +15,6 @@ namespace Inedo.Extensions.Chocolatey.Operations
 {
     [DisplayName("Ensure Chocolatey Package")]
     [Description("Ensures that a Chocolatey package is installed on a server.")]
-    [ScriptNamespace("Chocolatey")]
     [ScriptAlias("Ensure-Package")]
     [Tag("chocolatey")]
     public sealed class EnsurePackageOperation : EnsureOperation<ChocolateyPackageConfiguration>
@@ -158,58 +157,6 @@ namespace Inedo.Extensions.Chocolatey.Operations
                     " from Chocolatey is " + state
                 )
             );
-        }
-
-        private async Task<List<string[]>> ExecuteChocolateyAsync(IOperationExecutionContext context, string args)
-        {
-            var agent = await context.Agent.GetServiceAsync<IRemoteProcessExecuter>().ConfigureAwait(false);
-            using (var process = agent.CreateProcess(new RemoteProcessStartInfo { FileName = "choco", Arguments = args }))
-            {
-                var output = new List<string[]>();
-
-                process.OutputDataReceived +=
-                    (s, e) =>
-                    {
-                        this.LogDebug(e.Data);
-                        var data = e.Data.Trim().Split('|');
-                        if (data.Length >= 2)
-                            output.Add(data);
-                    };
-
-                bool error = false;
-
-                process.ErrorDataReceived +=
-                    (s, e) =>
-                    {
-                        if (!string.IsNullOrWhiteSpace(e.Data))
-                        {
-                            error = true;
-                            this.LogError(e.Data);
-                        }
-                    };
-
-                try
-                {
-                    process.Start();
-                    await process.WaitAsync(context.CancellationToken).ConfigureAwait(false);
-                    if (process.ExitCode < 0)
-                    {
-                        this.LogError("Chocolatey returned exit code " + process.ExitCode);
-                        return null;
-                    }
-                    else if (error)
-                    {
-                        return null;
-                    }
-
-                    return output;
-                }
-                catch (Win32Exception ex)
-                {
-                    this.LogError("There was an error executing chocolatey. Ensure that chocolatey is installed on the remote server. Error was: " + ex.Message);
-                    return null;
-                }
-            }
         }
     }
 }

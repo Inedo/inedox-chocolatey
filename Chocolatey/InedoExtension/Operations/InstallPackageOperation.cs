@@ -14,7 +14,6 @@ namespace Inedo.Extensions.Chocolatey.Operations
 {
     [DisplayName("Install Chocolatey Package")]
     [Description("Installs a Chocolatey package on a server.")]
-    [ScriptNamespace("Chocolatey")]
     [ScriptAlias("Install-Package")]
     [DefaultProperty(nameof(PackageName))]
     [Tag("chocolatey")]
