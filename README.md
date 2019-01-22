@@ -1,6 +1,6 @@
 # inedox-chocolatey
 
-[![Build status](https://ci.appveyor.com/api/projects/status/058m55ysndy8e920/branch/master?svg=true)](https://ci.appveyor.com/project/Inedo/inedox-chocolatey/branch/master)
+[![Build status](https://buildmaster.inedo.com/api/ci-badges/image?API_Key=badges&$ApplicationId=15)](https://buildmaster.inedo.com/api/ci-badges/link?API_Key=badges&$ApplicationId=15)
 
 Contains operations for working with Chocolatey.
 
