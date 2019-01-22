@@ -41,6 +41,12 @@ namespace Inedo.Extensions.Chocolatey.Operations
         [SuggestableValue(typeof(SpecialSourceSuggestionProvider))]
         public string Source { get; set; } = "https://chocolatey.org/api/v2";
 
+        [Persistent]
+        [ScriptAlias("AdditionalArguments")]
+        [DisplayName("Additional arguments")]
+        [Description("Arguments supplied here are passed directly to choco when a package is installed or upgraded.")]
+        public string AdditionalArguments { get; set; }
+
         public override async Task ExecuteAsync(IOperationExecutionContext context)
         {
             var buffer = new StringBuilder("upgrade --yes --fail-on-unfound ", 200);
@@ -61,6 +67,12 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 buffer.Append("--source \"");
                 buffer.Append(this.Source);
                 buffer.Append("\" ");
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.AdditionalArguments))
+            {
+                buffer.Append(this.AdditionalArguments);
+                buffer.Append(' ');
             }
 
             buffer.Append('\"');

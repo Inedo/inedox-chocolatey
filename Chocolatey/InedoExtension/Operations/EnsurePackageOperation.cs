@@ -29,6 +29,12 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 buffer.Append("\" ");
             }
 
+            if (!string.IsNullOrWhiteSpace(this.Template.AdditionalInstallArguments))
+            {
+                buffer.Append(this.Template.AdditionalInstallArguments);
+                buffer.Append(' ');
+            }
+
             buffer.Append('\"');
             buffer.Append(this.Template.PackageName);
             buffer.Append('\"');
@@ -105,6 +111,12 @@ namespace Inedo.Extensions.Chocolatey.Operations
                     buffer.Append("--source \"");
                     buffer.Append(this.Template.Source);
                     buffer.Append("\" ");
+                }
+
+                if (!string.IsNullOrWhiteSpace(this.Template.AdditionalInstallArguments))
+                {
+                    buffer.Append(this.Template.AdditionalInstallArguments);
+                    buffer.Append(' ');
                 }
             }
             else

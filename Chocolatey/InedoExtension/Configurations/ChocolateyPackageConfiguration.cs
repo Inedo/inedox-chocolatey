@@ -41,5 +41,12 @@ namespace Inedo.Extensions.Chocolatey.Configurations
         [SuggestableValue(typeof(SpecialSourceSuggestionProvider))]
         [IgnoreConfigurationDrift]
         public string Source { get; set; } = "https://chocolatey.org/api/v2";
+
+        [Persistent]
+        [IgnoreConfigurationDrift]
+        [ScriptAlias("AdditionalInstallArguments")]
+        [DisplayName("Additional install arguments")]
+        [Description("Arguments supplied here are passed directly to choco when a package is installed or upgraded.")]
+        public string AdditionalInstallArguments { get; set; }
     }
 }
