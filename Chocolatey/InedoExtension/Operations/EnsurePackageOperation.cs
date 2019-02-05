@@ -29,11 +29,19 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 buffer.Append("\" ");
             }
 
+            if (!string.IsNullOrEmpty(this.Template.Source))
+            {
+                buffer.Append("--version \"");
+                buffer.Append(this.Template.Version);
+                buffer.Append("\" ");
+                buffer.Append("--allow-downgrade ");
+            }
+
             if (!string.IsNullOrWhiteSpace(this.Template.AdditionalInstallArguments))
             {
                 buffer.Append(this.Template.AdditionalInstallArguments);
                 buffer.Append(' ');
-            }
+            }            
 
             buffer.Append('\"');
             buffer.Append(this.Template.PackageName);
@@ -97,14 +105,6 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 buffer.Append("upgrade --yes --fail-on-unfound ");
                 if (context.Simulation)
                     buffer.Append("--what-if ");
-
-                if (!string.IsNullOrEmpty(this.Template.Version))
-                {
-                    buffer.Append("--version \"");
-                    buffer.Append(this.Template.Version);
-                    buffer.Append("\" ");
-                    buffer.Append("--allow-downgrade ");
-                }
 
                 if (!string.IsNullOrEmpty(this.Template.Source))
                 {
