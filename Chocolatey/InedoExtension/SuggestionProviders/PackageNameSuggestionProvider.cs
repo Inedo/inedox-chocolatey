@@ -20,7 +20,8 @@ namespace Inedo.Extensions.Chocolatey.SuggestionProviders
                 return Enumerable.Empty<string>();
 
             var repository = PackageRepositoryFactory.Default.CreateRepository(source);
-            return repository.Search(packageName, false).AsEnumerable().Select(pkg => pkg.Id).Distinct();
+            var results = repository.Search(packageName, false).ToList();
+            return results.OrderBy(x=>x.Id).Select(pkg => pkg.Id).AsEnumerable().Distinct();
         }
     }
 }
