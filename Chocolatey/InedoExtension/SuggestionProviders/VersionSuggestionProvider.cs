@@ -11,7 +11,7 @@ namespace Inedo.Extensions.Chocolatey.SuggestionProviders
     {
         public Task<IEnumerable<string>> GetSuggestionsAsync(IComponentConfiguration config)
         {
-            return Task.Run(() => GetSuggestions(config["PackageName"], config["Version"], AH.CoalesceString(config["Source"], "https://chocolatey.org/api/v2")));
+            return Task.FromResult(GetSuggestions(config["PackageName"], config["Version"], AH.CoalesceString(config["Source"], "https://chocolatey.org/api/v2")));
         }
 
         internal static IEnumerable<string> GetSuggestions(string packageName, string partialVersion, string source)

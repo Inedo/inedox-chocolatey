@@ -10,7 +10,7 @@ namespace Inedo.Extensions.Chocolatey.SuggestionProviders
     {
         public Task<IEnumerable<string>> GetSuggestionsAsync(IComponentConfiguration config)
         {
-            return Task.Run(() => new[] { "latest" }.Concat(VersionSuggestionProvider.GetSuggestions("chocolatey", config["Version"], AH.CoalesceString(config["Source"], "https://chocolatey.org/api/v2"))));
+            return Task.FromResult(new[] { "latest" }.Concat(VersionSuggestionProvider.GetSuggestions("chocolatey", config["Version"], AH.CoalesceString(config["Source"], "https://chocolatey.org/api/v2"))));
         }
     }
 }
