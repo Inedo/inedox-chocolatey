@@ -106,6 +106,14 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 if (context.Simulation)
                     buffer.Append("--what-if ");
 
+                if (!string.IsNullOrEmpty(this.Template.Version))
+                {
+                    buffer.Append("--version \"");
+                    buffer.Append(this.Template.Version);
+                    buffer.Append("\" ");
+                    buffer.Append("--allow-downgrade ");
+                }
+
                 if (!string.IsNullOrEmpty(this.Template.Source))
                 {
                     buffer.Append("--source \"");
