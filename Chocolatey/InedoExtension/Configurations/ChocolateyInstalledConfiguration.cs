@@ -12,6 +12,8 @@ namespace Inedo.Extensions.Chocolatey.Configurations
     [DisplayName("Chocolatey")]
     public sealed class ChocolateyInstalledConfiguration : PersistedConfiguration
     {
+        public override string ConfigurationKey => "Chocolatey-Installed";
+
         [Persistent]
         [ScriptAlias("Version")]
         [Description("The version number of the Chocolatey to install. Also accepts \"latest\" to always use the latest version. Leave blank to only ensure Chocolatey is installed but not which version.")]
