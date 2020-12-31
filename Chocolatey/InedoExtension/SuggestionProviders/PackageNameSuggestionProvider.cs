@@ -18,7 +18,7 @@ namespace Inedo.Extensions.Chocolatey.SuggestionProviders
         {
             if (SpecialSourceSuggestionProvider.SpecialSources.Contains(source))
                 return Enumerable.Empty<string>();
-
+#warning Convert to .net 5 compatible review VersionSuggestionProvider
             var repository = PackageRepositoryFactory.Default.CreateRepository(source);
             var results = repository.Search(packageName, false).ToList();
             return results.OrderBy(x=>x.Id).Select(pkg => pkg.Id).AsEnumerable().Distinct();
