@@ -113,11 +113,10 @@ namespace Inedo.Extensions.Chocolatey.Operations
                         this.Template.Version = package.Version.ToOriginalString();
 #else
                         NuGet.Common.ILogger logger = NullLogger.Instance;
-                        CancellationToken cancellationToken = CancellationToken.None;
                         SourceCacheContext cache = new SourceCacheContext();                        
                         SourceRepository repository = Repository.Factory.GetCoreV2(new PackageSource(this.Template.Source) { ProtocolVersion = 2 });
                         var resource = await repository.GetResourceAsync<FindPackageByIdResource>();
-                        var versions = await resource.GetAllVersionsAsync("chocolatey", cache, logger, cancellationToken);
+                        var versions = await resource.GetAllVersionsAsync("chocolatey", cache, logger, context.CancellationToken);
                         this.Template.Version = versions.Where(v => !v.IsPrerelease).OrderByDescending(v => v).FirstOrDefault().ToFullString();
 #endif
                     }
