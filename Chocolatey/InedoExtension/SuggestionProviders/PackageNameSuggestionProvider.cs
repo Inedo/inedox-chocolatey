@@ -1,9 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Inedo.Extensibility;
 using Inedo.Web;
+#if NET452
 using NuGet;
+#else
+using NuGet.Common;
+using NuGet.Configuration;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+#endif
 
 namespace Inedo.Extensions.Chocolatey.SuggestionProviders
 {
@@ -18,10 +26,20 @@ namespace Inedo.Extensions.Chocolatey.SuggestionProviders
         {
             if (SpecialSourceSuggestionProvider.SpecialSources.Contains(source))
                 return Enumerable.Empty<string>();
-#warning Convert to .net 5 compatible review VersionSuggestionProvider
+#if NET452
             var repository = PackageRepositoryFactory.Default.CreateRepository(source);
             var results = repository.Search(packageName, false).ToList();
             return results.OrderBy(x=>x.Id).Select(pkg => pkg.Id).AsEnumerable().Distinct();
+#else
+            ILogger logger = NullLogger.Instance;
+            CancellationToken cancellationToken = CancellationToken.None;
+            SourceCacheContext cache = new SourceCacheContext();
+            SourceRepository repository = Repository.Factory.GetCoreV2(new PackageSource(source) { ProtocolVersion = 2 });
+            var resource = repository.GetResource<AutoCompleteResource>();
+            var resultsTask = resource.IdStartsWith(packageName, false, logger, cancellationToken);
+            resultsTask.Wait();
+            return resultsTask.Result;
+#endif
         }
     }
 }
