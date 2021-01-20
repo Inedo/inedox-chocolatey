@@ -7,7 +7,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Inedo.SDK" Version="1.10.0-ci.9" />
+    <PackageReference Include="Inedo.SDK" Version="1.10.0" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'net452'">
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
