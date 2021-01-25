@@ -6,12 +6,14 @@ using Inedo.Extensibility;
 using Inedo.Extensibility.Configurations;
 using Inedo.Extensibility.Credentials;
 using Inedo.Serialization;
+using Inedo.Web;
+using UsernamePasswordCredentials = Inedo.Extensions.Credentials.UsernamePasswordCredentials;
 
 namespace Inedo.Extensions.Chocolatey.Configurations
 {
     [Serializable]
     [DisplayName("Chocolatey Source")]
-    public sealed class ChocolateySourceConfiguration : PersistedConfiguration, IHasCredentials<UsernamePasswordCredentials>, IExistential
+    public sealed class ChocolateySourceConfiguration : PersistedConfiguration, IExistential
     {
         [ConfigurationKey]
         [Required]
@@ -29,18 +31,18 @@ namespace Inedo.Extensions.Chocolatey.Configurations
         [Persistent]
         [DisplayName("Credential")]
         [ScriptAlias("Credential")]
+        [SuggestableValue(typeof(SecureCredentialsSuggestionProvider<UsernamePasswordCredentials>))]
+        [IgnoreConfigurationDrift]
         public string CredentialName { get; set; }
 
         [Persistent]
         [DisplayName("User name")]
         [ScriptAlias("UserName")]
-        [MappedCredential(nameof(UsernamePasswordCredentials.UserName))]
         public string UserName { get; set; }
 
         [Persistent(Encrypted = true)]
         [DisplayName("Password")]
         [ScriptAlias("Password")]
-        [MappedCredential(nameof(UsernamePasswordCredentials.Password))]
         public SecureString Password { get; set; }
 
         [Persistent]
@@ -57,5 +59,16 @@ namespace Inedo.Extensions.Chocolatey.Configurations
         public bool Exists { get; set; } = true;
 
         public bool Disabled { get; set; }
+
+        public void SetCredentialProperties(ICredentialResolutionContext context)
+        {
+            if (!string.IsNullOrEmpty(this.CredentialName))
+            {
+                if (SecureCredentials.Create(this.CredentialName, context) is not UsernamePasswordCredentials credentials)
+                    throw new InvalidOperationException($"{this.CredentialName} is not a " + nameof(UsernamePasswordCredentials));
+                this.UserName = credentials.UserName;
+                this.Password = credentials.Password;
+            }
+        }
     }
 }

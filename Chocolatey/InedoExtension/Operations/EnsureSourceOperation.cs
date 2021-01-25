@@ -8,6 +8,7 @@ using Inedo.Diagnostics;
 using Inedo.Documentation;
 using Inedo.Extensibility;
 using Inedo.Extensibility.Configurations;
+using Inedo.Extensibility.Credentials;
 using Inedo.Extensibility.Operations;
 using Inedo.Extensions.Chocolatey.Configurations;
 
@@ -27,6 +28,8 @@ namespace Inedo.Extensions.Chocolatey.Operations
         }
         private async Task<ChocolateySourceConfiguration> CollectAsync(IOperationExecutionContext context)
         {
+            this.Template.SetCredentialProperties((ICredentialResolutionContext)context);
+
             if (this.Collected != null)
             {
                 return this.Collected;
@@ -58,6 +61,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
             return this.Collected; 
         }
 
+        [Obsolete]
         public override ComparisonResult Compare(PersistedConfiguration other)
         {
             var actual = (ChocolateySourceConfiguration)other;
@@ -82,8 +86,36 @@ namespace Inedo.Extensions.Chocolatey.Operations
             return new ComparisonResult(differences);
         }
 
+        public override Task<ComparisonResult> CompareAsync(PersistedConfiguration other, IOperationCollectionContext context)
+        {
+
+            this.Template.SetCredentialProperties((ICredentialResolutionContext)context);
+            var actual = (ChocolateySourceConfiguration)other;
+            if (this.Template.Exists != actual.Exists)
+                return Task.FromResult(new ComparisonResult(new[] { new Difference(nameof(this.Template.Exists), this.Template.Exists, actual.Exists) }));
+
+            if (!this.Template.Exists)
+                return Task.FromResult(ComparisonResult.Identical);
+
+            var differences = new List<Difference>();
+
+            if (this.Template.Url != actual.Url)
+                differences.Add(new Difference(nameof(this.Template.Url), this.Template.Url, actual.Url));
+            if (this.Template.UserName != actual.UserName)
+                differences.Add(new Difference(nameof(this.Template.UserName), this.Template.UserName, actual.UserName));
+            // Can't check password
+            if (this.Template.Priority != actual.Priority)
+                differences.Add(new Difference(nameof(this.Template.Priority), this.Template.Priority, actual.Priority));
+            if (actual.Disabled)
+                differences.Add(new Difference(nameof(this.Template.Disabled), false, true));
+
+            return Task.FromResult(new ComparisonResult(differences));
+        }
+
         public override async Task ConfigureAsync(IOperationExecutionContext context)
         {
+
+            this.Template.SetCredentialProperties((ICredentialResolutionContext)context);
             var buffer = new StringBuilder(200);
 
             if (this.Template.Exists)

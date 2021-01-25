@@ -60,7 +60,13 @@ namespace Inedo.Extensions.Chocolatey.Operations
             return this.Collected;
         }
 
+        [Obsolete]
         public override ComparisonResult Compare(PersistedConfiguration other)
+        {
+            return CompareInternal(other);
+        }
+
+        private ComparisonResult CompareInternal(PersistedConfiguration other)
         {
             var actual = (ChocolateyInstalledConfiguration)other;
             if (string.IsNullOrEmpty(this.Template.Version))
@@ -83,6 +89,11 @@ namespace Inedo.Extensions.Chocolatey.Operations
             }
 
             return ComparisonResult.Identical;
+        }
+
+        public override Task<ComparisonResult> CompareAsync(PersistedConfiguration other, IOperationCollectionContext context)
+        {
+            return Task.FromResult(this.CompareInternal(other));
         }
 
         public override async Task ConfigureAsync(IOperationExecutionContext context)
@@ -130,7 +141,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 if (context.Simulation)
                     return;
             }
-            else if (this.Compare(collected).AreEqual)
+            else if (this.CompareInternal(collected).AreEqual)
             {
                 this.LogDebug("No action needed.");
                 return;

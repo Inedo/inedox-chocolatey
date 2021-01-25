@@ -5,6 +5,7 @@
     <TargetFrameworks>net452;net5.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Inedo.SDK" Version="1.10.0" ExcludeAssets="runtime" />

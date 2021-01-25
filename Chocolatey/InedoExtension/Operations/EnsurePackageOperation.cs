@@ -76,6 +76,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
             };
         }
 
+        [Obsolete]
         public override ComparisonResult Compare(PersistedConfiguration other)
         {
             var diffs = new List<Difference>();
@@ -94,6 +95,26 @@ namespace Inedo.Extensions.Chocolatey.Operations
             }
 
             return new ComparisonResult(diffs);
+        }
+
+        public override Task<ComparisonResult> CompareAsync(PersistedConfiguration other, IOperationCollectionContext context)
+        {
+            var diffs = new List<Difference>();
+            var config = (ChocolateyPackageConfiguration)other;
+
+            if (this.Template.Exists != config.Exists)
+                diffs.Add(new Difference(nameof(ChocolateyPackageConfiguration.Exists), this.Template.Exists, config.Exists));
+
+            if (this.Template.Exists && config.Exists)
+            {
+                if (string.IsNullOrEmpty(this.Template.Version) && !config.IsLatestVersion)
+                    diffs.Add(new Difference(nameof(ChocolateyPackageConfiguration.IsLatestVersion), true, false));
+
+                if (!string.IsNullOrEmpty(this.Template.Version) && !string.Equals(this.Template.Version, config.Version, StringComparison.OrdinalIgnoreCase))
+                    diffs.Add(new Difference(nameof(ChocolateyPackageConfiguration.Version), this.Template.Version, config.Version));
+            }
+
+            return Task.FromResult(new ComparisonResult(diffs));
         }
 
         public override async Task ConfigureAsync(IOperationExecutionContext context)
