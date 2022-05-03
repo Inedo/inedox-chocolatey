@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Inedo.Agents;
@@ -10,16 +11,10 @@ using Inedo.Extensibility.Configurations;
 using Inedo.Extensibility.Operations;
 using Inedo.Extensions.Chocolatey.Configurations;
 using Inedo.IO;
-using System.Threading;
-using System.Linq;
-#if NET452
-using NuGet;
-#else
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
-#endif
 
 namespace Inedo.Extensions.Chocolatey.Operations
 {
@@ -39,7 +34,13 @@ namespace Inedo.Extensions.Chocolatey.Operations
         {
             if (this.Collected == null)
             {
-                var output = await this.ExecuteChocolateyAsync(context, "upgrade --what-if --limit-output " + AH.ConcatNE("--source \"", this.Template.Source, "\" ") + "chocolatey", true);
+                var args = "upgrade --what-if --limit-output ";
+                if (!string.IsNullOrWhiteSpace(this.Template.Source))
+                    args += $"--source \"{this.Template.Source}\" ";
+
+                args += "chocolatey";
+
+                var output = await this.ExecuteChocolateyAsync(context, args, true);
                 if (output == null)
                 {
                     this.Collected = new ChocolateyInstalledConfiguration
@@ -58,12 +59,6 @@ namespace Inedo.Extensions.Chocolatey.Operations
             }
 
             return this.Collected;
-        }
-
-        [Obsolete]
-        public override ComparisonResult Compare(PersistedConfiguration other)
-        {
-            return CompareInternal(other);
         }
 
         private ComparisonResult CompareInternal(PersistedConfiguration other)

@@ -2,24 +2,14 @@
   <PropertyGroup>
     <AssemblyName>Chocolatey</AssemblyName>
     <RootNamespace>Inedo.Extensions.Chocolatey</RootNamespace>
-    <TargetFrameworks>net452;net5.0</TargetFrameworks>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Inedo.SDK" Version="1.10.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Inedo.SDK" Version="2.0.0-ci.18" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Protocol" Version="6.1.0" />
+    <PackageReference Include="NuGet.Packaging" Version="6.1.0" />
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework) == 'net452'">
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Web.Xdt" Version="2.1.1" />
-    <PackageReference Include="NuGet.Core" Version="2.14.0" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework) == 'net5.0'">
-    <PackageReference Include="NuGet.Protocol" Version="5.8.0" />
-    <PackageReference Include="NuGet.Packaging" Version="5.8.0" />
-  </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$(TargetFramework) == 'net452'">
-    <Exec Command="powershell -Command &quot;if ((Test-Path C:\LocalDev\Tools\inedoxpack\inedoxpack.exe) -And (Test-Path C:\LocalDev\Otter\Extensions -PathType Container)) { C:\LocalDev\Tools\inedoxpack\inedoxpack.exe '$(TargetDir)..\$(TargetFileName)' 'C:\LocalDev\Otter\Extensions\$(TargetName).upack' 0.0.0 }&quot;" />
-  </Target>
 </Project>
