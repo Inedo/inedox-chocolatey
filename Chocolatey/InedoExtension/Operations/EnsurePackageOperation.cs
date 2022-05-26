@@ -37,22 +37,33 @@ namespace Inedo.Extensions.Chocolatey.Operations
                 buffer.Append("\" ");
             }
 
-            var credentials = packageSource?.GetCredentials((ICredentialResolutionContext)context) as UsernamePasswordCredentials;
-            var username = AH.CoalesceString(this.Template.UserName, credentials?.UserName);
-            if (!string.IsNullOrEmpty(username))
+            if (!string.IsNullOrWhiteSpace(this.Template.UserName) && this.Template.Password != null)
             {
-                this.LogDebug("Using user " + username);
+                this.LogDebug("Using user " + this.Template.UserName);
                 buffer.Append("--user=\"");
-                buffer.Append(username);
+                buffer.Append(this.Template.UserName);
+                buffer.Append("\" ");
+
+                buffer.Append("--password=\"");
+                buffer.Append(AH.Unprotect(this.Template.Password));
                 buffer.Append("\" ");
             }
-
-            var password = AH.CoalesceString(AH.Unprotect(this.Template.Password), AH.Unprotect(credentials?.Password));
-            if (!string.IsNullOrEmpty(password))
+            else
             {
-                buffer.Append("--password=\"");
-                buffer.Append(password);
-                buffer.Append("\" ");
+                var credentials = packageSource?.GetCredentials((ICredentialResolutionContext)context);
+                if (credentials != null)
+                {
+                    if (credentials is UsernamePasswordCredentials usernamePassword)
+                    {
+                        this.LogDebug("Using user " + usernamePassword.UserName);
+                       buffer.Append(@$"--user=""{usernamePassword.UserName}"" --password=""{AH.Unprotect(usernamePassword.Password)}"" ");
+                    }
+                    else if (credentials is TokenCredentials token)
+                    {
+                        this.LogDebug("Using ProGet API Key");
+                        buffer.Append(@$"--user=""api"" --password=""{AH.Unprotect(token.Token)}"" ");
+                    }
+                }
             }
 
             if (!string.IsNullOrEmpty(this.Template.Version))
@@ -150,22 +161,33 @@ namespace Inedo.Extensions.Chocolatey.Operations
                     buffer.Append("\" ");
                 }
 
-                var credentials = packageSource?.GetCredentials((ICredentialResolutionContext)context) as UsernamePasswordCredentials;
-                var username = AH.CoalesceString(this.Template.UserName, credentials?.UserName);
-                if (!string.IsNullOrEmpty(username))
+                if (!string.IsNullOrWhiteSpace(this.Template.UserName) && this.Template.Password != null)
                 {
-                    this.LogDebug("Using user " + username);
+                    this.LogDebug("Using user " + this.Template.UserName);
                     buffer.Append("--user=\"");
-                    buffer.Append(username);
+                    buffer.Append(this.Template.UserName);
+                    buffer.Append("\" ");
+
+                    buffer.Append("--password=\"");
+                    buffer.Append(AH.Unprotect(this.Template.Password));
                     buffer.Append("\" ");
                 }
-
-                var password = AH.CoalesceString(AH.Unprotect(this.Template.Password), AH.Unprotect(credentials?.Password));
-                if (!string.IsNullOrEmpty(password))
+                else
                 {
-                    buffer.Append("--password=\"");
-                    buffer.Append(password);
-                    buffer.Append("\" ");
+                    var credentials = packageSource?.GetCredentials((ICredentialResolutionContext)context);
+                    if (credentials != null)
+                    {
+                        if (credentials is UsernamePasswordCredentials usernamePassword)
+                        {
+                            this.LogDebug("Using user " + usernamePassword.UserName);
+                            buffer.Append(@$"--user=""{usernamePassword.UserName}"" --password=""{AH.Unprotect(usernamePassword.Password)}"" ");
+                        }
+                        else if (credentials is TokenCredentials token)
+                        {
+                            this.LogDebug("Using ProGet API Key");
+                            buffer.Append(@$"--user=""api"" --password=""{AH.Unprotect(token.Token)}"" ");
+                        }
+                    }
                 }
 
                 if (!string.IsNullOrWhiteSpace(this.Template.AdditionalInstallArguments))

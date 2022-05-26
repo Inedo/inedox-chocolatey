@@ -10,7 +10,7 @@ namespace Inedo.Extensions.Chocolatey.Credentials
 {
     [DisplayName("Chocolatey Package Source")]
     [Description("Connect to a Chocolatey package feed")]
-    public sealed class ChocolateySourceSecureResource : SecureResource<UsernamePasswordCredentials>
+    public sealed class ChocolateySourceSecureResource : SecureResource<UsernamePasswordCredentials, TokenCredentials>
     {
         [Required]
         [Persistent]
