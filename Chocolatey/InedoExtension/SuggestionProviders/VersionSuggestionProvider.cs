@@ -18,43 +18,68 @@ namespace Inedo.Extensions.Chocolatey.SuggestionProviders
 {
     internal sealed class VersionSuggestionProvider : ISuggestionProvider
     {
-        public Task<IEnumerable<string>> GetSuggestionsAsync(IComponentConfiguration config)
+        public async Task<IEnumerable<string>> GetSuggestionsAsync(IComponentConfiguration config)
         {
-            return Task.FromResult(GetSuggestions(config, AH.CoalesceString(config["PackageName"], config["Name"]), config["Version"], config["Source"], AH.CoalesceString(config["ResourceName"], config["From"]), config["UserName"], AH.CreateSecureString(config["Password"])));
-        }
-
-        internal static IEnumerable<string> GetSuggestions(IComponentConfiguration config, string packageName, string partialVersion, string source, string resourceName, string userName, SecureString password)
-        {
-            if (SpecialSourceSuggestionProvider.SpecialSources.Contains(source))
+            
+            if (SpecialSourceSuggestionProvider.SpecialSources.Contains(config["Source"]))
                 return Enumerable.Empty<string>();
 
             ILogger logger = NullLogger.Instance;
             CancellationToken cancellationToken = CancellationToken.None;
-            SourceCacheContext cache = new SourceCacheContext();
+            SourceCacheContext cache = new SourceCacheContext { NoCache = true };
 
 
-            var packageSource = string.IsNullOrWhiteSpace(resourceName) ? null : (ChocolateySourceSecureResource)SecureResource.Create(resourceName, config.EditorContext as IResourceResolutionContext);
-            var sourceUrl = AH.CoalesceString(source, packageSource?.SourceUrl, "https://chocolatey.org/api/v2");
+            var packageSource = string.IsNullOrWhiteSpace(config["ResourceName"]) ? null : (ChocolateySourceSecureResource)SecureResource.Create(config["ResourceName"], config.EditorContext as IResourceResolutionContext);
+            var sourceUrl = AH.CoalesceString(config["Source"], packageSource?.SourceUrl, "https://chocolatey.org/api/v2");
+
+            PackageSourceCredential credentials = null;
+            if (!string.IsNullOrWhiteSpace(config["UserName"]) && !string.IsNullOrWhiteSpace(config["Password"]))
+            {
+                credentials = new PackageSourceCredential(
+                                        sourceUrl,
+                                        config["UserName"],
+                                        config["Password"],
+                                        true,
+                                        null
+                                    );
+            }
+            else
+            {
+                var packageCredentials = packageSource?.GetCredentials(config.EditorContext as ICredentialResolutionContext);
+                if(packageCredentials != null && packageCredentials is UsernamePasswordCredentials usernamePassword)
+                {
+                    credentials = new PackageSourceCredential(
+                                        sourceUrl,
+                                        usernamePassword.UserName,
+                                        AH.Unprotect(usernamePassword.Password),
+                                        true,
+                                        null
+                                    );
+                }
+                else if(packageCredentials != null && packageCredentials is TokenCredentials token)
+                {
+                    credentials = new PackageSourceCredential(
+                                        sourceUrl,
+                                        "API",
+                                        AH.Unprotect(token.Token),
+                                        true,
+                                        null
+                                    );
+                }
+            }
 
             SourceRepository repository = Repository.Factory.GetCoreV2(
                 new PackageSource(sourceUrl)
                 {
                     ProtocolVersion = 2,
-                    Credentials = packageSource?.GetCredentials(config.EditorContext as ICredentialResolutionContext) is not UsernamePasswordCredentials credentials
-                                    ? null
-                                    : new PackageSourceCredential(
-                                        sourceUrl,
-                                        AH.CoalesceString(userName, credentials.UserName),
-                                        AH.CoalesceString(AH.Unprotect(password), AH.Unprotect(credentials.Password)),
-                                        true,
-                                        null
-                                    )
+                    Credentials = credentials,
+                     IsMachineWide = false
                 }
             );
             var resource = repository.GetResource<AutoCompleteResource>();
-            var versionsTask = resource.VersionStartsWith(packageName, partialVersion, false, cache, logger, cancellationToken);
-            versionsTask.Wait();
-            return versionsTask.Result.OrderByDescending(v => v).Select(v => v.ToFullString());
+            var versions = await resource.VersionStartsWith(config["PackageName"], config["Version"], false, cache, logger, cancellationToken);
+           
+            return versions.OrderByDescending(v => v).Select(v => v.ToFullString());
 
         }
     }
