@@ -1,10 +1,8 @@
-﻿using Inedo.Extensibility;
-using Inedo.Extensibility.Configurations;
-using Inedo.Extensions.Chocolatey.SuggestionProviders;
-using Inedo.Serialization;
-using Inedo.Web;
-using System;
+﻿using System;
 using System.ComponentModel;
+using Inedo.Extensibility;
+using Inedo.Extensibility.Configurations;
+using Inedo.Serialization;
 
 namespace Inedo.Extensions.Chocolatey.Configurations
 {
@@ -15,18 +13,14 @@ namespace Inedo.Extensions.Chocolatey.Configurations
         public override string ConfigurationKey => "Chocolatey-Installed";
 
         [Persistent]
-        [ScriptAlias("Version")]
-        [Description("The version number of the Chocolatey to install. Also accepts \"latest\" to always use the latest version. Leave blank to only ensure Chocolatey is installed but not which version.")]
-        [SuggestableValue(typeof(ChocolateyVersionSuggestionProvider))]
-        public string Version { get; set; }
-
-        public string LatestVersion { get; set; }
+        public bool Exists { get; set; }
 
         [Persistent]
-        [ScriptAlias("Source")]
-        [DefaultValue("https://chocolatey.org/api/v2")]
-        [SuggestableValue(typeof(SpecialSourceSuggestionProvider))]
+        [DisplayName("Install Script Url")]
+        [ScriptAlias("InstallScriptUrl")]
+        [Description("URL for the Chocolatey install PowerShell script.  The default is https://community.chocolatey.org/install.ps1")]
+        [DefaultValue("https://community.chocolatey.org/install.ps1")]
         [IgnoreConfigurationDrift]
-        public string Source { get; set; } = "https://chocolatey.org/api/v2";
+        public string InstallScriptUrl { get; set; } = "https://community.chocolatey.org/install.ps1";
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Security;
 using Inedo.Documentation;
 using Inedo.Extensibility;
 using Inedo.Extensibility.Configurations;
+using Inedo.Extensions.Chocolatey.Credentials;
 using Inedo.Extensions.Chocolatey.SuggestionProviders;
 using Inedo.Serialization;
 using Inedo.Web;
@@ -35,18 +37,42 @@ namespace Inedo.Extensions.Chocolatey.Configurations
         [DefaultValue(true)]
         public bool Exists { get; set; } = true;
 
+        [DisplayName("From resource")]
+        [ScriptAlias("From")]
+        [ScriptAlias("Credentials")]
+        [SuggestableValue(typeof(SecureResourceSuggestionProvider<ChocolateySourceSecureResource>))]
+        [IgnoreConfigurationDrift]
+        [Category("Connection/Identity")]
+        public string ResourceName { get; set; }
+
         [Persistent]
         [ScriptAlias("Source")]
-        [DefaultValue("https://chocolatey.org/api/v2")]
+        [Description("The value to specify for --source parameter in choco install.  This can be a special source or a URL to a Chocolatey repository.")]
         [SuggestableValue(typeof(SpecialSourceSuggestionProvider))]
         [IgnoreConfigurationDrift]
-        public string Source { get; set; } = "https://chocolatey.org/api/v2";
+        [Category("Connection/Identity")]
+        public string Source { get; set; }
+
+        [Persistent]
+        [IgnoreConfigurationDrift]
+        [DisplayName("User name")]
+        [ScriptAlias("UserName")]
+        [Category("Connection/Identity")]
+        public string UserName { get; set; }
+
+        [Persistent(Encrypted = true)]
+        [IgnoreConfigurationDrift]
+        [DisplayName("Password")]
+        [ScriptAlias("Password")]
+        [Category("Connection/Identity")]
+        public SecureString Password { get; set; }
 
         [Persistent]
         [IgnoreConfigurationDrift]
         [ScriptAlias("AdditionalInstallArguments")]
         [DisplayName("Additional install arguments")]
         [Description("Arguments supplied here are passed directly to choco when a package is installed or upgraded.")]
+        [Category("Advanced")]
         public string AdditionalInstallArguments { get; set; }
     }
 }

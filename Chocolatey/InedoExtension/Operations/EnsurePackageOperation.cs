@@ -8,8 +8,12 @@ using Inedo.Diagnostics;
 using Inedo.Documentation;
 using Inedo.Extensibility;
 using Inedo.Extensibility.Configurations;
+using Inedo.Extensibility.Credentials;
 using Inedo.Extensibility.Operations;
+using Inedo.Extensibility.SecureResources;
 using Inedo.Extensions.Chocolatey.Configurations;
+using Inedo.Extensions.Chocolatey.Credentials;
+using Inedo.Extensions.Credentials;
 
 namespace Inedo.Extensions.Chocolatey.Operations
 {
@@ -22,14 +26,36 @@ namespace Inedo.Extensions.Chocolatey.Operations
         public override async Task<PersistedConfiguration> CollectAsync(IOperationCollectionContext context)
         {
             var buffer = new StringBuilder("upgrade --yes --limit-output --fail-on-unfound --what-if ", 200);
-            if (!string.IsNullOrEmpty(this.Template.Source))
+            
+            var packageSource = string.IsNullOrWhiteSpace(this.Template.ResourceName) ? null : (ChocolateySourceSecureResource)SecureResource.Create(this.Template.ResourceName, (IResourceResolutionContext)context);
+            var source = AH.CoalesceString(this.Template.Source, packageSource?.SourceUrl);
+            if (!string.IsNullOrEmpty(source))
             {
-                buffer.Append("--source \"");
-                buffer.Append(this.Template.Source);
+                this.LogDebug("Using source " + source);
+                buffer.Append("--source=\"");
+                buffer.Append(source);
                 buffer.Append("\" ");
             }
 
-            if (!string.IsNullOrEmpty(this.Template.Source))
+            var credentials = packageSource?.GetCredentials((ICredentialResolutionContext)context) as UsernamePasswordCredentials;
+            var username = AH.CoalesceString(this.Template.UserName, credentials?.UserName);
+            if (!string.IsNullOrEmpty(username))
+            {
+                this.LogDebug("Using user " + username);
+                buffer.Append("--user=\"");
+                buffer.Append(username);
+                buffer.Append("\" ");
+            }
+
+            var password = AH.CoalesceString(AH.Unprotect(this.Template.Password), AH.Unprotect(credentials?.Password));
+            if (!string.IsNullOrEmpty(password))
+            {
+                buffer.Append("--password=\"");
+                buffer.Append(password);
+                buffer.Append("\" ");
+            }
+
+            if (!string.IsNullOrEmpty(this.Template.Version))
             {
                 buffer.Append("--version \"");
                 buffer.Append(this.Template.Version);
@@ -47,7 +73,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
             buffer.Append(this.Template.PackageName);
             buffer.Append('\"');
 
-            var output = await this.ExecuteChocolateyAsync(context, buffer.ToString());
+            var output = await this.ExecuteChocolateyAsync(context, buffer.ToString(), true);
             if (output == null || output.Count < 1 || output[0].Length < 4 || !string.Equals(output[0][3], "false", StringComparison.OrdinalIgnoreCase))
             {
                 // this assumes packages are never pinned
@@ -114,10 +140,31 @@ namespace Inedo.Extensions.Chocolatey.Operations
                     buffer.Append("--allow-downgrade ");
                 }
 
-                if (!string.IsNullOrEmpty(this.Template.Source))
+                var packageSource = string.IsNullOrWhiteSpace(this.Template.ResourceName) ? null : (ChocolateySourceSecureResource)SecureResource.Create(this.Template.ResourceName, (IResourceResolutionContext)context);
+                var source = AH.CoalesceString(this.Template.Source, packageSource?.SourceUrl);
+                if (!string.IsNullOrEmpty(source))
                 {
-                    buffer.Append("--source \"");
-                    buffer.Append(this.Template.Source);
+                    this.LogDebug("Using source " + source);
+                    buffer.Append("--source=\"");
+                    buffer.Append(source);
+                    buffer.Append("\" ");
+                }
+
+                var credentials = packageSource?.GetCredentials((ICredentialResolutionContext)context) as UsernamePasswordCredentials;
+                var username = AH.CoalesceString(this.Template.UserName, credentials?.UserName);
+                if (!string.IsNullOrEmpty(username))
+                {
+                    this.LogDebug("Using user " + username);
+                    buffer.Append("--user=\"");
+                    buffer.Append(username);
+                    buffer.Append("\" ");
+                }
+
+                var password = AH.CoalesceString(AH.Unprotect(this.Template.Password), AH.Unprotect(credentials?.Password));
+                if (!string.IsNullOrEmpty(password))
+                {
+                    buffer.Append("--password=\"");
+                    buffer.Append(password);
                     buffer.Append("\" ");
                 }
 
@@ -138,17 +185,8 @@ namespace Inedo.Extensions.Chocolatey.Operations
             buffer.Append(this.Template.PackageName);
             buffer.Append('\"');
 
-            int exitCode = await this.ExecuteCommandLineAsync(
-                context,
-                new RemoteProcessStartInfo
-                {
-                    FileName = "choco",
-                    Arguments = buffer.ToString()
-                }
-            );
 
-            if (exitCode != 0)
-                this.LogError("Process exited with code " + exitCode);
+            await this.ExecuteChocolateyAsync(context, buffer.ToString());
         }
 
         protected override ExtendedRichDescription GetDescription(IOperationConfiguration config)

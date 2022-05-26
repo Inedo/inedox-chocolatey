@@ -31,7 +31,6 @@ namespace Inedo.Extensions.Chocolatey.Configurations
         [Persistent]
         [DisplayName("Credential")]
         [ScriptAlias("Credential")]
-        [SuggestableValue(typeof(SecureCredentialsSuggestionProvider<UsernamePasswordCredentials>))]
         [IgnoreConfigurationDrift]
         public string CredentialName { get; set; }
 
@@ -60,15 +59,5 @@ namespace Inedo.Extensions.Chocolatey.Configurations
 
         public bool Disabled { get; set; }
 
-        public void SetCredentialProperties(ICredentialResolutionContext context)
-        {
-            if (!string.IsNullOrEmpty(this.CredentialName))
-            {
-                if (SecureCredentials.Create(this.CredentialName, context) is not UsernamePasswordCredentials credentials)
-                    throw new InvalidOperationException($"{this.CredentialName} is not a " + nameof(UsernamePasswordCredentials));
-                this.UserName = credentials.UserName;
-                this.Password = credentials.Password;
-            }
-        }
     }
 }

@@ -4,14 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Inedo.Extensibility;
 using Inedo.Web;
-#if NET452
-using NuGet;
-#else
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
-#endif
 
 namespace Inedo.Extensions.Chocolatey.SuggestionProviders
 {
@@ -19,18 +15,13 @@ namespace Inedo.Extensions.Chocolatey.SuggestionProviders
     {
         public Task<IEnumerable<string>> GetSuggestionsAsync(IComponentConfiguration config)
         {
-            return Task.FromResult(GetSuggestions(config["PackageName"], AH.CoalesceString(config["Source"], "https://chocolatey.org/api/v2")));
+            return Task.FromResult(GetSuggestions(AH.CoalesceString(config["PackageName"], config["Name"]), AH.CoalesceString(config["Source"], "https://chocolatey.org/api/v2")));
         }
 
         private static IEnumerable<string> GetSuggestions(string packageName, string source)
         {
             if (SpecialSourceSuggestionProvider.SpecialSources.Contains(source))
                 return Enumerable.Empty<string>();
-#if NET452
-            var repository = PackageRepositoryFactory.Default.CreateRepository(source);
-            var results = repository.Search(packageName, false).ToList();
-            return results.OrderBy(x=>x.Id).Select(pkg => pkg.Id).AsEnumerable().Distinct();
-#else
             ILogger logger = NullLogger.Instance;
             CancellationToken cancellationToken = CancellationToken.None;
             SourceCacheContext cache = new SourceCacheContext();
@@ -39,7 +30,6 @@ namespace Inedo.Extensions.Chocolatey.SuggestionProviders
             var resultsTask = resource.IdStartsWith(packageName, false, logger, cancellationToken);
             resultsTask.Wait();
             return resultsTask.Result;
-#endif
         }
     }
 }

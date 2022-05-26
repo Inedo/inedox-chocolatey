@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.IO;
 using System.Threading.Tasks;
 using Inedo.Agents;
 using Inedo.Diagnostics;
@@ -13,7 +13,17 @@ namespace Inedo.Extensions.Chocolatey
         public static async Task<List<string[]>> ExecuteChocolateyAsync(this Operation operation, IOperationExecutionContext context, string args, bool missingChocolateyOk = false)
         {
             var agent = await context.Agent.GetServiceAsync<IRemoteProcessExecuter>().ConfigureAwait(false);
-            using (var process = agent.CreateProcess(new RemoteProcessStartInfo { FileName = "choco", Arguments = args }))
+            var fileOps = await context.Agent.GetServiceAsync<IFileOperationsExecuter>().ConfigureAwait(false);
+            
+            var installLocation = AH.CoalesceString(await agent.GetEnvironmentVariableValueAsync("ChocolateyInstall"), @"C:\ProgramData\chocolatey");
+            var chocoExistsAtInstallLocation = await fileOps.FileExistsAsync(Path.Combine(installLocation, "choco.exe"));
+            
+            var startInfo = new RemoteProcessStartInfo { FileName = "choco.exe", Arguments = args };
+
+            if (chocoExistsAtInstallLocation)
+                startInfo.FileName = Path.Combine(installLocation, "choco.exe");
+
+            using (var process = agent.CreateProcess(startInfo))
             {
                 var output = new List<string[]>();
 
@@ -40,7 +50,7 @@ namespace Inedo.Extensions.Chocolatey
 
                 try
                 {
-                    process.Start();
+                    await process.StartAsync(context.CancellationToken);
                     await process.WaitAsync(context.CancellationToken).ConfigureAwait(false);
                     if (process.ExitCode != 0)
                     {
@@ -54,18 +64,18 @@ namespace Inedo.Extensions.Chocolatey
 
                     return output;
                 }
-                catch (AggregateException aex) when (aex.InnerException is Win32Exception wex)
+                catch (AggregateException aex) when (aex.InnerException is Exception iox)
                 {
-                    logChocolateyException(wex);
+                    logChocolateyException(iox);
                     return null;
                 }
-                catch (Win32Exception wex)
+                catch (Exception iox)
                 {
-                    logChocolateyException(wex);
+                    logChocolateyException(iox);
                     return null;
                 }
 
-                void logChocolateyException(Win32Exception wex)
+                void logChocolateyException(Exception wex)
                 {
                     if (missingChocolateyOk)
                         return;
