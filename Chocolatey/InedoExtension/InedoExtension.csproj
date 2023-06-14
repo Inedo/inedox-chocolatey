@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Chocolatey</AssemblyName>
     <RootNamespace>Inedo.Extensions.Chocolatey</RootNamespace>
@@ -9,7 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Inedo.SDK" Version="2.0.1" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.Protocol" Version="6.2.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.2.4" />
     <PackageReference Include="NuGet.Packaging" Version="6.2.0" />
   </ItemGroup>
 </Project>
