@@ -27,7 +27,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
         {
             var buffer = new StringBuilder("upgrade --yes --limit-output --fail-on-unfound --what-if ", 200);
             
-            var packageSource = string.IsNullOrWhiteSpace(this.Template.ResourceName) ? null : (ChocolateySourceSecureResource)SecureResource.Create(this.Template.ResourceName, (IResourceResolutionContext)context);
+            var packageSource = string.IsNullOrWhiteSpace(this.Template.ResourceName) ? null : (ChocolateySourceSecureResource)SecureResource.Create(SecureResourceType.General, this.Template.ResourceName, (IResourceResolutionContext)context);
             var source = AH.CoalesceString(this.Template.Source, packageSource?.SourceUrl);
             if (!string.IsNullOrEmpty(source))
             {
@@ -151,7 +151,7 @@ namespace Inedo.Extensions.Chocolatey.Operations
                     buffer.Append("--allow-downgrade ");
                 }
 
-                var packageSource = string.IsNullOrWhiteSpace(this.Template.ResourceName) ? null : (ChocolateySourceSecureResource)SecureResource.Create(this.Template.ResourceName, (IResourceResolutionContext)context);
+                var packageSource = string.IsNullOrWhiteSpace(this.Template.ResourceName) ? null : (ChocolateySourceSecureResource)SecureResource.Create(SecureResourceType.General, this.Template.ResourceName, (IResourceResolutionContext)context);
                 var source = AH.CoalesceString(this.Template.Source, packageSource?.SourceUrl);
                 if (!string.IsNullOrEmpty(source))
                 {

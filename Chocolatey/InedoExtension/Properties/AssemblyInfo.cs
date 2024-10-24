@@ -7,9 +7,9 @@ using Inedo.Extensibility;
 [assembly: AssemblyDescription("Contains operations for working with Chocolatey.")]
 [assembly: AssemblyProduct("any")]
 [assembly: AssemblyCompany("Inedo, LLC")]
-[assembly: AssemblyCopyright("Copyright © Inedo 2022")]
-[assembly: AssemblyVersion("2.0.2")]
-[assembly: AssemblyFileVersion("2.0.2")]
+[assembly: AssemblyCopyright("Copyright © Inedo 2024")]
+[assembly: AssemblyVersion("3.1.2")]
+[assembly: AssemblyFileVersion("3.1.0")]
 
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(false)]

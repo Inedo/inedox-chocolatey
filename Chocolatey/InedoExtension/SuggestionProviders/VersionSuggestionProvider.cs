@@ -29,7 +29,7 @@ namespace Inedo.Extensions.Chocolatey.SuggestionProviders
             SourceCacheContext cache = new SourceCacheContext { NoCache = true };
 
 
-            var packageSource = string.IsNullOrWhiteSpace(config["ResourceName"]) ? null : (ChocolateySourceSecureResource)SecureResource.Create(config["ResourceName"], config.EditorContext as IResourceResolutionContext);
+            var packageSource = string.IsNullOrWhiteSpace(config["ResourceName"]) ? null : (ChocolateySourceSecureResource)SecureResource.Create(SecureResourceType.General, config["ResourceName"], config.EditorContext as IResourceResolutionContext);
             var sourceUrl = AH.CoalesceString(config["Source"], packageSource?.SourceUrl, "https://chocolatey.org/api/v2");
 
             PackageSourceCredential credentials = null;
