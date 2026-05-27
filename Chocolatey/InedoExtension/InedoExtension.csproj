@@ -8,8 +8,8 @@
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Inedo.SDK" Version="4.0.0-ci.7" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.Protocol" Version="7.3.0" />
-    <PackageReference Include="NuGet.Packaging" Version="7.3.0" />
+    <PackageReference Include="Inedo.SDK" Version="4.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Protocol" Version="7.6.0" />
+    <PackageReference Include="NuGet.Packaging" Version="7.6.0" />
   </ItemGroup>
 </Project>
